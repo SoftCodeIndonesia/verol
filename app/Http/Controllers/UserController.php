@@ -79,6 +79,8 @@ class UserController extends Controller
         }
         
         $user->assignRole($request->role);
+
+        
         
         if($request->has('permissions')){
             foreach ($request->permissions as $key => $value) {
@@ -146,6 +148,8 @@ class UserController extends Controller
 
         $user = User::find($id);
 
+        
+
         $user->name = $request->name;
         $user->username = $request->username;
 
@@ -163,11 +167,34 @@ class UserController extends Controller
             $user->foto = $imageName;
         }
         
+        $user->roles()->detach();
+        
         $user->assignRole($request->role);
+
+        $RemovePermission = [];
+
+        foreach ($this->permission::all() as $key => $value) {
+            
+           
+            if($request->permission != null){
+                if(!in_array($value->name, $request->permissions)){
+                    array_push($RemovePermission, $value->name);
+                }
+            }
+        }
+
+        // dd($RemovePermission);
+        foreach ($RemovePermission as $key => $value) {
+            var_dump($value);
+            $user->revokePermissionTo($value);
+        }
+
+        // // dd($RemovePermission);
+        // dd($user->getAllPermissions()->toArray());
         
         if($request->has('permissions')){
-            foreach ($request->permissions as $key => $value) {
-                $user->givePermissionTo($value);
+            if(!empty($request->permissions)) {
+                $user->syncPermissions($request->permissions);
             }
         }
 
