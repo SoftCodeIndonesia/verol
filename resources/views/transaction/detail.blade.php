@@ -9,6 +9,11 @@
 
             <div class="row justify-content-center">
                 <div class="col-sm-12 text-center">
+                    @if($transaction->type == 0)
+                    <h5 class="font-weight-bold">LAPORAN PENGELUARAN BARANG</h5>
+                    @else
+                    <h5 class="font-weight-bold">LAPORAN STOK BARANG</h5>
+                    @endif
                     <p>PT CAHAYA ABADI PLASTIK</p>
                     <p>Jl. Kenari 1 Blok G1 No.27, Delta Silicon V, Lippo Cikarang</p>
                     <p>Bekasi, Jawa Barat, Indonesia</p>
@@ -24,9 +29,15 @@
                                     <th>Kode Barang</th>
                                     <th>Nama</th>
                                     <th>Satuan</th>
+                                    @if($transaction->type == 0)
+                                    <th>Quantity</th>
+                                    @else
                                     <th>Stock</th>
+                                    @endif
+                                    @if($transaction->type == 1)
                                     <th>Actual</th>
                                     <th>Selisih</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,15 +48,15 @@
                                 </td>
                                 <td>{{$value->material->name}}</td>
                                 <td>{{$value->satuan}}</td>
-                                <td>
-                                    {{$value->stock}}
-                                </td>
+                                <td>{{$value->stock}}</td>
+                                @if($transaction->type == 1)
                                 <td>
                                     {{$value->actual}}
                                 </td>
                                 <td>
                                     {{$value->selisih}}
                                 </td>
+                                @endif
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -14,9 +14,15 @@
                             <th>Kode Barang</th>
                             <th>Nama</th>
                             <th>Satuan</th>
+                            @if($type == 0)
+                            <th>Quantity</th>
+                            @else
                             <th>Stock</th>
+                            @endif
+                            @if($type == 1)
                             <th>Actual</th>
                             <th>Selisih</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -29,14 +35,22 @@
                         <td>{{$value->name}}</td>
                         <td><input class="form-control" type="text" placeholder="Masukan Satuan" name="satuan[]">
                         </td>
+                        @if($type == 1)
                         <td><input class="form-control tf_stock stock_{{$key}}" data-id="{{$key}}" type="number" min="1"
                                 placeholder="Masukan Stock" name="stock[]"></td>
                         </td>
+                        @else
+                        <td><input class="form-control" data-id="{{$key}}" type="number" min="1"
+                                placeholder="Masukan Quantity" name="quantity[]"></td>
+                        </td>
+                        @endif
+                        @if($type == 1)
                         <td><input class="form-control actual_{{$key}}" readonly data-id="{{$key}}" type="number"
                                 min="1" name="actual[]" value="{{$value->stock}}"></td>
                         <td><input class="form-control selisih_{{$key}}" type="number" data-id="{{$key}}" min="1"
                                 name="selisih[]">
                         </td>
+                        @endif
                         </tr>
                         @endforeach
                     </tbody>

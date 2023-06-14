@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\MaterialModel;
+use App\Models\TransactionModel;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
@@ -30,7 +33,12 @@ class HomeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        return view('home', $user);
+
+        $data['transaction_out'] = TransactionModel::where('type', 0)->get();
+        $data['transaction_in'] = TransactionModel::where('type', 1)->get();
+        $data['users'] = User::all();
+        $data['materials'] = MaterialModel::all();
+        $data['user'] = $user;
+        return view('home', $data);
     }
 }

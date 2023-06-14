@@ -76,10 +76,18 @@ class TransactionController extends Controller
             $material_trans->material_id = $value;
             $material_trans->transaction_id = $transaction->id;
             $material_trans->satuan = $request->satuan[$key] ?? '';
-            $material_trans->stock = $request->stock[$key] ?? 0;
-            $material_trans->actual = $request->actual[$key] ?? 0;
-            $material_trans->selisih = $request->selisih[$key] ?? 0;
-            $material_trans->created_at = time();
+            if($request->type == 1){
+                $material_trans->stock = $request->stock[$key] ?? 0;
+                $material_trans->actual = $request->actual[$key] ?? 0;
+                $material_trans->selisih = $request->selisih[$key] ?? 0;
+                $material_trans->created_at = time();
+            }else{
+                $material_trans->stock = $request->quantity[$key] ?? 0;
+                $material_trans->actual = 0;
+                $material_trans->selisih = 0;
+                $material_trans->created_at = time();
+            }
+            
 
             $material_trans->save();
 

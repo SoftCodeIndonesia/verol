@@ -11,9 +11,10 @@
                             <h6 class="m-0 font-weight-bold text-primary">Laporan</h6>
                         </div>
                         <div class="col-sm-6 text-right">
-                            <a href="{{route('transaction.add', ['type' => 0])}}" class="btn btn-sm btn-primary">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                data-target="#modalOutTrans">
                                 <i class="fa fa-fw fa-plus-circle"></i> Buat Laporan Barang Keluar
-                            </a>
+                            </button>
                             <!-- <a href="{{route('transaction.add',['type' => 1])}}" class="btn btn-sm btn-success">
                                 <i class="fa fa-fw fa-plus-circle"></i> Buat Laporan Barang Masuk
                             </a> -->
@@ -144,9 +145,13 @@
                 </table>
                 @endif
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-primary">Lanjut</button>
+            <div class="modal-footer d-flex justify-content-between">
+                <a href="{{route('material.add')}}" class="btn btn-success"><i class="fa fa-fw fa-plus-circle"></i>
+                    Tambah Material</a>
+                <div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Lanjut</button>
+                </div>
             </div>
     </div>
     </form>
@@ -156,65 +161,72 @@
 <div class="modal fade" id="modalOutTrans" tabindex="-1" role="dialog" aria-labelledby="modalOutTransTitle"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalOutTransTitle">Pilih Material</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                @if(empty($materials))
-                Material Kosong
-                @else
-                <form method="POST" action="{{route('transaction.add', [''])}}">
-                    @csrf
-                    <table class="table table-bordered" id="dataTable" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Kode Barang</th>
-                                <th>Nama</th>
-                                <th>Quantity</th>
-                                <th style="width:10%">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($materials as $material)
+        <form method="POST" action="{{route('transaction.add')}}">
+            <input type="hidden" name="type" value="0">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalOutTransTitle">Pilih Material</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if(empty($materials))
+                    Material Kosong
+                    @else
+                    <form method="POST" action="{{route('transaction.add', [''])}}">
+                        @csrf
+                        <table class="table table-bordered" id="dataTable" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama</th>
+                                    <th>Quantity</th>
+                                    <th style="width:10%">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($materials as $material)
 
-                            <tr>
-                                <td>
-                                    @if(count($material->images) > 0)
-                                    <img src="{{URL::to('/images/material/' . $material->images[0]->path)}}"
-                                        class="rounded" width="50" id="preview_profile" alt="user-profile">
-                                    @else
-                                    -
-                                    @endif
-                                </td>
-                                <td>{{$material->kode_barang}}</td>
-                                <td>{{$material->name}}</td>
-                                <td>{{$material->stock}}</td>
-                                <td>
-                                    <div class="form-check">
-                                        <input class="form-check-input" name="materials[]" type="checkbox"
-                                            value="{{$material->id}}" id="check">
-                                        <label class="form-check-label" for="check">
-                                            Pilih
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </form>
-                @endif
+                                <tr>
+                                    <td>
+                                        @if(count($material->images) > 0)
+                                        <img src="{{URL::to('/images/material/' . $material->images[0]->path)}}"
+                                            class="rounded" width="50" id="preview_profile" alt="user-profile">
+                                        @else
+                                        -
+                                        @endif
+                                    </td>
+                                    <td>{{$material->kode_barang}}</td>
+                                    <td>{{$material->name}}</td>
+                                    <td>{{$material->stock}}</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" name="materials[]" type="checkbox"
+                                                value="{{$material->id}}" id="check">
+                                            <label class="form-check-label" for="check">
+                                                Pilih
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </form>
+                    @endif
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <a href="{{route('material.add')}}" class="btn btn-success"><i class="fa fa-fw fa-plus-circle"></i>
+                        Tambah Material</a>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Lanjut</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 
