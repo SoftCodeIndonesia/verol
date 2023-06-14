@@ -23,9 +23,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::get('/transaction', [App\Http\Controllers\TransactionController::class, 'index'])->middleware('permission:view transaksi')->name('transaction');
-    Route::get('/transaction/add', [App\Http\Controllers\TransactionController::class, 'create'])->middleware('permission:create transaksi')->name('transaction.add');
+    Route::post('/transaction/add/', [App\Http\Controllers\TransactionController::class, 'create'])->middleware('permission:create transaksi')->name('transaction.add');
+    Route::get('/transaction/check/{id}', [App\Http\Controllers\TransactionController::class, 'check'])->middleware('permission:check transaksi')->name('transaction.check');
+    Route::get('/transaction/approve/{id}', [App\Http\Controllers\TransactionController::class, 'approve'])->middleware('permission:approve transaksi')->name('transaction.approve');
     Route::post('/transaction/store', [App\Http\Controllers\TransactionController::class, 'store'])->middleware('permission:create transaksi')->name('transaction.store');
     Route::get('/transaction/edit/{id}', [App\Http\Controllers\TransactionController::class, 'edit'])->middleware('permission:edit transaksi')->name('transaction.edit');
+    Route::get('/transaction/show/{id}', [App\Http\Controllers\TransactionController::class, 'show'])->middleware('permission:view transaksi')->name('transaction.show');
     Route::put('/transaction/update/{id}', [App\Http\Controllers\TransactionController::class, 'update'])->middleware('permission:edit transaksi')->name('transaction.update');
     Route::delete('/transaction/destory/{id}', [App\Http\Controllers\TransactionController::class, 'destroy'])->middleware('permission:delete transaksi')->name('transaction.destroy');
 

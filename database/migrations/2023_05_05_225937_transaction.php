@@ -15,19 +15,23 @@ class Transaction extends Migration
     {
         Schema::create('transaction', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('material_id');
-            $table->integer('quantity')->default(1);
+            // $table->unsignedBigInteger('material_id');
+            // $table->integer('quantity')->default(1);
 
             // 0 = keluar
             // 1 = masuk
 
+            $table->string('unique_id')->unique();
             $table->integer('type')->default(0);
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('approved_by')->nullable();
+            $table->unsignedBigInteger('checked_by')->nullable();
+            $table->unsignedBigInteger('prepared_by')->nullable();
             $table->integer('created_at');
 
             
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('material_id')->references('id')->on('material')->onDelete('cascade');;
+            $table->foreign('approved_by')->references('id')->on('users');
+            $table->foreign('checked_by')->references('id')->on('users');
+            $table->foreign('prepared_by')->references('id')->on('users');
         });
     }
 

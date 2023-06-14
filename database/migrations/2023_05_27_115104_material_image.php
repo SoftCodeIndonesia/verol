@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Material extends Migration
+class MaterialImage extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,13 @@ class Material extends Migration
      */
     public function up()
     {
-        Schema::create('material', function (Blueprint $table) {
+        Schema::create('material_image', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_barang');
-            $table->string('name');
-            $table->integer('stock')->default(0);
-            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('material_id');
+            $table->string('path');
             $table->integer('created_at');
 
-            
-            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('material_id')->references('id')->on('material');
         });
     }
 
@@ -33,6 +30,6 @@ class Material extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('material');
+        Schema::dropIfExists('material_image');
     }
 }

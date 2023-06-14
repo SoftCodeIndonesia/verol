@@ -41,18 +41,10 @@
     <li class="nav-item">
         <a class="nav-link" href="{{route('transaction')}}">
             <i class="fa fa-fw fa-microchip"></i>
-            <span>Transaksi</span></a>
-    </li>
-    @endif
-
-    @if(Auth::user()->hasDirectPermission('view report'))
-    <!-- Nav Item - Dashboard -->
-    <li class="nav-item">
-        <a class="nav-link" href="vendor/index.html">
-            <i class="fas fa-fw fa-file"></i>
             <span>Laporan</span></a>
     </li>
     @endif
+
 
     @if(Auth::user()->hasDirectPermission('create management'))
     <!-- Nav Item - Pages Collapse Menu -->

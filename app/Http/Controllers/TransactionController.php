@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MaterialModel;
 use App\Models\TransactionModel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\TransactionMaterialModel;
+use Illuminate\Support\Facades\Redirect;
 
 class TransactionController extends Controller
 {
@@ -25,7 +28,8 @@ class TransactionController extends Controller
     public function index()
     {
         $data['transactions'] = TransactionModel::all();
-        
+        $data['materials'] = MaterialModel::all();
+     
         return view('transaction/index', $data);
     }
 
@@ -34,9 +38,18 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        $data['materials'] = MaterialModel::all();
+        // dd($request->materials);
+        $data['materials'] = $users = DB::table('material')
+        ->whereIn('id', $request->materials)
+        ->get();
+        $data['type'] = $request->type;
+        $data['javascript'] = [
+            'transaction/add.js'
+        ];
+
+        
         return view('transaction/add', $data);
     }
 
@@ -48,36 +61,33 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $material = MaterialModel::find($request->material);
+        
+        
+        $transaction = new TransactionModel();
+        $transaction->type = $request->type;
+        $transaction->prepared_by = Auth::user()->id;
+        $transaction->created_at = time();
+        $transaction->generateId();
 
-        $this->validate($request, [
-            'material' => 'required',
-            'type' => 'required',
-            'quantity' => 'required|numeric|min:1',
-        ]);
+        $transaction->save();
 
-        if($request->type == 0 && $material->stock < $request->quantity){
-            return redirect('/transaction')->with('error', 'Stock material tidak mencukupi!');
-        }else{
+        foreach ($request->material_id as $key => $value) {
+            $material_trans = new TransactionMaterialModel();
+            $material_trans->material_id = $value;
+            $material_trans->transaction_id = $transaction->id;
+            $material_trans->satuan = $request->satuan[$key] ?? '';
+            $material_trans->stock = $request->stock[$key] ?? 0;
+            $material_trans->actual = $request->actual[$key] ?? 0;
+            $material_trans->selisih = $request->selisih[$key] ?? 0;
+            $material_trans->created_at = time();
 
-            $transaction = new TransactionModel();
+            $material_trans->save();
 
-            $transaction->material_id = $material->id;
-            $transaction->quantity = $request->quantity;
-            $transaction->type = $request->type;
-            $transaction->user_id = Auth::user()->id;
-            $transaction->created_at = time();
+        };
 
-            $transaction->save();
 
-            if($request->type == 1){
-                $material->stock = $material->stock + $request->quantity;
-            }else{
-                $material->stock = $material->stock - $request->quantity;
-            }
-            $material->save();
-            return redirect('/transaction')->with('success', 'Berhasil membuat transaksi baru!');
-        }
+
+        return redirect('/transaction')->with('success', 'Berhasil membuat transaksi baru!');
     }
 
     /**
@@ -86,9 +96,11 @@ class TransactionController extends Controller
      * @param  \App\Models\TransactionModel  $transactionModel
      * @return \Illuminate\Http\Response
      */
-    public function show(TransactionModel $transactionModel)
+    public function show($id)
     {
-        //
+        $data['transaction'] = TransactionModel::with(['materials', 'prepared', 'checker', 'approver'])->where(['id' => $id])->first();
+        $data['data_alert'] = check_status($data['transaction']);
+        return view('transaction/detail', $data);
     }
 
     /**
@@ -101,6 +113,39 @@ class TransactionController extends Controller
     {
         //
     }
+    public function check($id)
+    {
+        $transaction = TransactionModel::find($id);
+
+        $transaction->checked_by = Auth::user()->id;
+
+        $transaction->save();
+
+        return Redirect::route('transaction.show', ['id' => $transaction->id]);
+
+    }
+    public function approve($id)
+    {
+        $transaction = TransactionModel::find($id);
+
+        $transaction->approved_by = Auth::user()->id;
+
+        foreach ($transaction->materials as $key => $value) {
+            if($transaction->type == 1){
+                $value->material->stock = $value->material->stock + $value->stock;
+            }else if($transaction->type == 0){
+                $value->material->stock = $value->material->stock - $value->stock;
+            }
+
+            $value->material->save();
+        }
+
+        $transaction->save();
+
+        return Redirect::route('transaction.show', ['id' => $transaction->id]);
+
+    }
+
 
     /**
      * Update the specified resource in storage.
@@ -123,12 +168,6 @@ class TransactionController extends Controller
     public function destroy($id)
     {
         $transactionModel = TransactionModel::find($id);
-
-        $material = MaterialModel::find($transactionModel->material->id);
-
-        $material->stock = $material->stock - $transactionModel->quantity;
-
-        $material->save();
 
         TransactionModel::destroy($id);
 

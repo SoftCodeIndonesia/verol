@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\MaterialModel;
+use App\Models\ImageMaterialModel;
 use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
@@ -25,6 +26,13 @@ class MaterialController extends Controller
     public function index()
     {
         $data['materials'] = MaterialModel::all();
+
+        // foreach ($data['materials'] as $key => $value) {
+        //     var_dump($value->images[0]->path);
+        // }
+
+        // die;
+        
         return view('material/material', $data);
     }
 
@@ -35,8 +43,10 @@ class MaterialController extends Controller
      */
     public function create()
     {
-        
-        return view('material.add');
+        $data['javascript'] = [
+            'material/add.js'
+        ];
+        return view('material.add', $data);
     }
 
     /**
@@ -47,21 +57,41 @@ class MaterialController extends Controller
      */
     public function store(Request $request)
     {
+        
+
         $this->validate($request, [
             'name' => 'required',
             'stock' => 'required|numeric',
-            'satuan' => 'required',
+            'kode_barang' => 'required',
         ]);
 
         $material = new MaterialModel();
 
         $material->name = $request->name;
         $material->stock = $request->stock;
-        $material->satuan = $request->satuan;
+        $material->kode_barang = $request->kode_barang;
         $material->created_by = Auth::user()->id;
         $material->created_at = time();
 
         $material->save();
+        if($request->has('images')){
+            foreach ($request->file('images') as $key => $value) {
+                if($value != null){
+                    $explode = explode('.', $value);
+                    
+                    $image = new ImageMaterialModel();
+
+                    $imageName = time().'.'. $value->extension();  
+                    $value->move(public_path('images/material'), $imageName);
+
+                    $image->material_id = $material->id;
+                    $image->path = $imageName;
+                    $image->created_at = time();
+                    $image->save();
+                }
+            }
+            
+        }
 
         return redirect('/material')->with('success', 'Berhasil menambahkan material');
     }
@@ -101,14 +131,14 @@ class MaterialController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'stock' => 'required|numeric',
-            'satuan' => 'required',
+            'kode_barang' => 'required',
         ]);
 
         $material = MaterialModel::find($id);
 
         $material->name = $request->name;
         $material->stock = $request->stock;
-        $material->satuan = $request->satuan;
+        $material->kode_barang = $request->kode_barang;
 
         $material->save();
 

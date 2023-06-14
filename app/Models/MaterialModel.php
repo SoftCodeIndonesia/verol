@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ImageMaterialModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MaterialModel extends Model
 {
@@ -12,11 +13,16 @@ class MaterialModel extends Model
     protected $table = 'material';
 
     protected $fillable = [
+        'kode_barang',
         'name',
         'stock',
-        'satuan',
     ];
 
     public $timestamps = false;
+
+
+    public function images(){
+        return $this->hasMany(ImageMaterialModel::class, 'id');
+    }
 
 }

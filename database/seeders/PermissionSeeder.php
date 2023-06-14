@@ -26,6 +26,8 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'create transaksi']);
         Permission::create(['name' => 'edit transaksi']);
         Permission::create(['name' => 'delete transaksi']);
+        Permission::create(['name' => 'check transaksi']);
+        Permission::create(['name' => 'approve transaksi']);
 
         // create permissions management
         Permission::create(['name' => 'view management']);

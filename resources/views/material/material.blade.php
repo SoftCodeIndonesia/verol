@@ -22,18 +22,28 @@
                         <table class="table table-bordered" id="dataTable" cellspacing="0">
                             <thead>
                                 <tr>
+                                    <th>Image</th>
+                                    <th>Kode Barang</th>
                                     <th>Nama</th>
                                     <th>Quantity</th>
-                                    <th>Satuan</th>
                                     <th style="width:10%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($materials as $material)
+
                                 <tr>
+                                    <td>
+                                        @if(count($material->images) > 0)
+                                        <img src="{{URL::to('/images/material/' . $material->images[0]->path)}}"
+                                            class="rounded" width="50" id="preview_profile" alt="user-profile">
+                                        @else
+                                        -
+                                        @endif
+                                    </td>
+                                    <td>{{$material->kode_barang}}</td>
                                     <td>{{$material->name}}</td>
                                     <td>{{$material->stock}}</td>
-                                    <td>{{$material->satuan}}</td>
                                     <td>
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-danger dropdown-toggle"
